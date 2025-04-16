@@ -18,14 +18,12 @@ A handy Unity Editor tool for managing localization keys and language files dire
 
 ## 🖼️ Screenshots
 
-| Localization File View | Add Missing Localizers | Create Language View |
-|------------------------|------------------------|----------------------|
-| ![Main](Images/Localization_File.png) | ![Add](Images/Add_Missing_Localizer.png) | ![Create](Images/Create_New_Language.png) |
+| Localization File View | Add Missing Localizers | Create Language View | Find Localization Files |
+|------------------------|------------------------|----------------------|----------------------|
+| ![Main](Images/Localization_File.png) | ![Add](Images/Add_Missing_Localizer.png) | ![Create](Images/Create_New_Language.png) | ![Create](Images/Find_Localization_Files.png) |
 
 More views:
 - ![All Views](Images/All_Views.png)
-- ![Tool Window](Images/Base_tool_window.png)
-- ![Find Files](Images/Find_Localization_Files.png)
 
 ---
 
