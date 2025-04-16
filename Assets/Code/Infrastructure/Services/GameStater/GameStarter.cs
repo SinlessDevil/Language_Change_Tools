@@ -53,14 +53,11 @@ namespace Code.Infrastructure.Services.GameStater
         
         private PlayerData LoadProgress()
         {
-            Debug.Log("LoadProgress");
-
             return _saveLoadService.Load();
         }
 
         private PlayerData SetUpBaseProgress()
         {
-            Debug.Log("InitializeProgress");
             var progress = new PlayerData();
             _progressService.PlayerData = progress;
             return progress;

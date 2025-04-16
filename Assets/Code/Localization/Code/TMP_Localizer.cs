@@ -1,7 +1,6 @@
 using TMPro;
 using UnityEngine;
 using Code.Localization.Code.Services.LocalizeLanguageService;
-using Zenject;
 
 namespace Code.Localization.Code
 {

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using Sirenix.OdinInspector;
@@ -18,7 +19,7 @@ namespace Localization.Editor
         [MenuItem("Tools/Localization Editor 🈺")]
         private static void OpenWindow()
         {
-            var window = GetWindow<LocalizationEditorWindow>();
+            LocalizationEditorWindow window = GetWindow<LocalizationEditorWindow>();
             window.titleContent = new GUIContent("Localization Editor");
             window.minSize = new Vector2(600, 800);
             window.Show();
@@ -48,14 +49,11 @@ namespace Localization.Editor
         [Button("Save Current Language", ButtonSizes.Large), GUIColor(0.6f, 1f, 0.6f)]
         private void Save()
         {
-            if (string.IsNullOrEmpty(_selectedLanguage)) return;
+            if (string.IsNullOrEmpty(_selectedLanguage)) 
+                return;
 
             string path = Path.Combine(LocalizationFolder, _selectedLanguage + ".txt");
-            List<string> lines = new();
-            foreach (var entry in _entries)
-            {
-                lines.Add($"{entry.Key}={entry.Value.Replace("\n", "\\n")}");
-            }
+            List<string> lines = _entries.Select(entry => $"{entry.Key}={entry.Value.Replace("\n", "\\n")}").ToList();
 
             File.WriteAllLines(path, lines);
             AssetDatabase.Refresh();
@@ -176,28 +174,28 @@ namespace Localization.Editor
         [Button("Save Changes To Assets", ButtonSizes.Large), GUIColor(0.6f, 1f, 0.6f)]
         private void ApplyLocalizationKeyChangesToAssets()
         {
-            Debug.Log("=== 🔁 Start Applying LocalizationKey Changes ===");
+            Debug.Log("Start Applying LocalizationKey Changes");
 
             int updatedCount = 0;
-            var pathsToLog = new HashSet<string>();
+            HashSet<string> pathsToLog = new HashSet<string>();
 
-            foreach (var entry in _localizersInAssets)
+            foreach (TMPAssetEntry entry in _localizersInAssets)
             {
                 if (string.IsNullOrEmpty(entry.AssetPath) || string.IsNullOrEmpty(entry.GameObjectName))
                 {
-                    Debug.LogWarning("⚠️ Missing path or object name, skipping.");
+                    Debug.LogWarning("Missing path or object name, skipping.");
                     continue;
                 }
 
-                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(entry.AssetPath);
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(entry.AssetPath);
                 if (prefab == null)
                 {
-                    Debug.LogWarning($"⚠️ Failed to load prefab at path: {entry.AssetPath}");
+                    Debug.LogWarning($"Failed to load prefab at path: {entry.AssetPath}");
                     continue;
                 }
 
-                var localizers = prefab.GetComponentsInChildren<LocalizeBase>(true);
-                foreach (var localizer in localizers)
+                LocalizeBase[] localizers = prefab.GetComponentsInChildren<LocalizeBase>(true);
+                foreach (LocalizeBase localizer in localizers)
                 {
                     if (localizer.gameObject.name != entry.GameObjectName) continue;
 
@@ -211,15 +209,15 @@ namespace Localization.Editor
                         EditorUtility.SetDirty(localizer);
                         updatedCount++;
 
-                        Debug.Log($"📝 Updated '{entry.GameObjectName}' in '{entry.AssetPath}': '{oldKey}' ➜ '{newKey}'");
+                        Debug.Log($"Updated '{entry.GameObjectName}' in '{entry.AssetPath}': '{oldKey}' ➜ '{newKey}'");
                     }
                     else
                     {
-                        Debug.Log($"✅ No change needed for '{entry.GameObjectName}' (key already '{oldKey}')");
+                        Debug.Log($"No change needed for '{entry.GameObjectName}' (key already '{oldKey}')");
                     }
 
                     pathsToLog.Add(entry.AssetPath);
-                    break; // нашли нужный объект — идём дальше
+                    break;
                 }
 
                 EditorUtility.SetDirty(prefab);
@@ -335,7 +333,7 @@ namespace Localization.Editor
 
         private IEnumerable<SystemLanguage> GetNewLanguages()
         {
-            var existing = new HashSet<string>(GetAvailableLanguages(), StringComparer.OrdinalIgnoreCase);
+            HashSet<string> existing = new HashSet<string>(GetAvailableLanguages(), StringComparer.OrdinalIgnoreCase);
             foreach (SystemLanguage lang in Enum.GetValues(typeof(SystemLanguage)))
             {
                 if (!existing.Contains(lang.ToString()))
