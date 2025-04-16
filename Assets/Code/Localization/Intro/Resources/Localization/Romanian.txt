@@ -1,7 +1,0 @@
-eng=English
-ru=Russian
-uk=Ukrainian
-pla=Play
-go=GameOver
-ex=Exit
-so=Sounds
