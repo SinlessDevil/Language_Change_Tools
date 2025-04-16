@@ -51,10 +51,11 @@ namespace Localization.Editor
         }
 
         [FoldoutGroup("Add New Language", expanded: true)]
-        [ShowInInspector, PropertyOrder(99)]
+        [ShowInInspector, PropertyOrder(0)]
         private SystemLanguage newLanguage = SystemLanguage.Afrikaans;
 
         [FoldoutGroup("Add New Language")]
+        [ShowInInspector, PropertyOrder(1)]
         [Button("🆕 Create New Language From Base (English)", ButtonSizes.Large), GUIColor(0.1f, 0.8f, 1f)]
         private void CreateNewLanguageFromEnglish()
         {
