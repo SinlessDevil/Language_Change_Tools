@@ -5,6 +5,7 @@ using System.IO;
 using Code.Localization.Code;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 
@@ -189,6 +190,41 @@ namespace Localization.Editor
 
             AssetDatabase.SaveAssets();
             Debug.Log("✅ Localization keys in assets updated.");
+        }
+        
+        [FoldoutGroup("Add Missing Localizers", expanded: true)]
+        [Button("➕ Add TMP_Localizer to All TMP_Text In Resources", ButtonSizes.Large), GUIColor(0.8f, 0.9f, 1f)]
+        private void AddTMP_LocalizersToResources()
+        {
+            int addedCount = 0;
+
+            GameObject[] allPrefabs = Resources.LoadAll<GameObject>("");
+            foreach (var prefab in allPrefabs)
+            {
+                if (prefab == null) continue;
+
+                var path = AssetDatabase.GetAssetPath(prefab);
+                if (string.IsNullOrEmpty(path)) continue;
+
+                var root = PrefabUtility.LoadPrefabContents(path);
+                var texts = root.GetComponentsInChildren<TMP_Text>(true);
+
+                foreach (var text in texts)
+                {
+                    if (text.GetComponent<LocalizeBase>() == null)
+                    {
+                        Undo.RecordObject(text.gameObject, "Add TMP_Localizer");
+                        text.gameObject.AddComponent<TMP_Localizer>();
+                        addedCount++;
+                    }
+                }
+
+                PrefabUtility.SaveAsPrefabAsset(root, path);
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+
+            AssetDatabase.SaveAssets();
+            Debug.Log($"✅ Added TMP_Localizer to {addedCount} TMP_Text objects.");
         }
         
         private void LoadLocalizationFile()
