@@ -8,14 +8,6 @@ namespace Code.Localization.Code
 
         public abstract void UpdateLocale();
 
-        protected virtual void Start()
-        {
-            if (!Locale.currentLanguageHasBeenSet)
-                Locale.currentLanguageHasBeenSet = true;
-
-            UpdateLocale();
-        }
-
         public static string GetLocalizedString(string key)
         {
             if (Locale.currentLanguageStrings.ContainsKey(key))

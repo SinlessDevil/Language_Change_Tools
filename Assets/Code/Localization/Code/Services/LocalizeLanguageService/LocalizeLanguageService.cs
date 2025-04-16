@@ -9,6 +9,12 @@ namespace Code.Localization.Code.Services.LocalizeLanguageService
     {
         private const string ResourcesPath = "Localization";
 
+        public void InitLanguage()
+        {
+            Debug.Log("InitLanguage =" + GetCurrentLanguage());
+            SetLanguage(GetCurrentLanguage().ToString());
+        }
+
         public List<string> GetAvailableLanguages()
         {
             TextAsset[] files = Resources.LoadAll<TextAsset>(ResourcesPath);
@@ -17,14 +23,14 @@ namespace Code.Localization.Code.Services.LocalizeLanguageService
 
         public void SetLanguage(string languageName)
         {
-            Locale.CurrentLanguage = languageName.ToString();
+            Locale.CurrentLanguage = languageName;
             Locale.PlayerLanguage = LanguageNameToSystemLanguage(languageName);
             LocalizeBase[] allTexts = Object.FindObjectsOfType<LocalizeBase>();
             foreach (var t in allTexts)
                 t.UpdateLocale();
         }
 
-        public string GetCurrentLanguage() => Locale.CurrentLanguage;
+        public SystemLanguage GetCurrentLanguage() => Locale.PlayerLanguage;
 
         private SystemLanguage LanguageNameToSystemLanguage(string name)
         {

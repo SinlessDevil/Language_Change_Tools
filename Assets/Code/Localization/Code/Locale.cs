@@ -66,6 +66,7 @@ namespace Code.Localization.Code
             {
                 PlayerPrefs.SetInt(STR_LOCALIZATION_KEY, (int)value);
                 PlayerPrefs.Save();
+                Debug.Log("Locale: Player language set to " + value);
             }
         }
     }

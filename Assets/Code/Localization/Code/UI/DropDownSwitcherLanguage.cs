@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Code.Localization.Code.Services.LocalizeLanguageService;
 using TMPro;
 using UnityEngine;
@@ -33,11 +34,11 @@ namespace Code.Localization.Code.UI
         {
             _dropdown.ClearOptions();
 
-            var languages = _localizeLanguageService.GetAvailableLanguages();
+            List<string> languages = _localizeLanguageService.GetAvailableLanguages();
             _dropdown.AddOptions(languages);
             
-            var currentLanguage = _localizeLanguageService.GetCurrentLanguage();
-            int currentIndex = languages.IndexOf(currentLanguage);
+            SystemLanguage currentLanguage = _localizeLanguageService.GetCurrentLanguage();
+            int currentIndex = languages.IndexOf(currentLanguage.ToString());
             _dropdown.SetValueWithoutNotify(currentIndex >= 0 ? currentIndex : 0);
 
             _dropdown.onValueChanged.AddListener(OnDropdownValueChanged);

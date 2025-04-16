@@ -2,6 +2,7 @@ using Code.Infrastructure.Factory;
 using Code.Infrastructure.Services.PersistenceProgress;
 using Code.Infrastructure.Services.PersistenceProgress.Player;
 using Code.Infrastructure.Services.SaveLoad;
+using Code.Localization.Code.Services.LocalizeLanguageService;
 using UnityEngine;
 
 namespace Code.Infrastructure.Services.GameStater
@@ -11,15 +12,18 @@ namespace Code.Infrastructure.Services.GameStater
         private readonly IPersistenceProgressService _progressService;
         private readonly ISaveLoadService _saveLoadService;
         private readonly IUIFactory _uiFactory;
-        
+        private readonly ILocalizeLanguageService _localizeLanguageService;
+
         public GameStarter(
             IPersistenceProgressService progressService,
             ISaveLoadService saveLoadService, 
-            IUIFactory uiFactory)
+            IUIFactory uiFactory,
+            ILocalizeLanguageService localizeLanguageService)
         {
             _progressService = progressService;
             _saveLoadService = saveLoadService;
             _uiFactory = uiFactory;
+            _localizeLanguageService = localizeLanguageService;
         }
 
         public void Initialize()
@@ -28,6 +32,7 @@ namespace Code.Infrastructure.Services.GameStater
             
             InitProgress();
             InitUI();
+            InitLanguage();
         }
         
         private void InitProgress()
@@ -39,6 +44,11 @@ namespace Code.Infrastructure.Services.GameStater
         {
             _uiFactory.CreateUIRoot();
             _uiFactory.CreateGameHud();
+        }
+        
+        private void InitLanguage()
+        {
+            _localizeLanguageService.InitLanguage();
         }
         
         private PlayerData LoadProgress()
