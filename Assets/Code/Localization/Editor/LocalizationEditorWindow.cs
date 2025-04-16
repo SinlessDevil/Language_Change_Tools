@@ -179,17 +179,31 @@ namespace Localization.Editor
         [Button("💾 Save Changes To Assets", ButtonSizes.Large), GUIColor(0.6f, 1f, 0.6f)]
         private void ApplyLocalizationKeyChangesToAssets()
         {
+            var pathsToSave = new HashSet<string>();
+
             foreach (var entry in _localizersInAssets)
             {
                 if (entry.Component == null) continue;
 
                 Undo.RecordObject(entry.Component, "Change Localization Key");
                 entry.Component.localizationKey = entry.LocalizationKey;
-                EditorUtility.SetDirty(entry.Component);
+                EditorUtility.SetDirty(entry.Component.gameObject);
+
+                if (!string.IsNullOrEmpty(entry.AssetPath))
+                {
+                    pathsToSave.Add(entry.AssetPath);
+                }
+            }
+
+            foreach (var path in pathsToSave)
+            {
+                var prefabRoot = PrefabUtility.LoadPrefabContents(path);
+                PrefabUtility.SaveAsPrefabAsset(prefabRoot, path);
+                PrefabUtility.UnloadPrefabContents(prefabRoot);
             }
 
             AssetDatabase.SaveAssets();
-            Debug.Log("✅ Localization keys in assets updated.");
+            Debug.Log("✅ Localization keys in assets updated and prefabs saved.");
         }
         
         [FoldoutGroup("Add Missing Localizers", expanded: true)]
