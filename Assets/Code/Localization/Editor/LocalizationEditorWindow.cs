@@ -52,14 +52,20 @@ namespace Localization.Editor
 
         [FoldoutGroup("Add New Language", expanded: true)]
         [ShowInInspector, PropertyOrder(0)]
-        private SystemLanguage newLanguage = SystemLanguage.Afrikaans;
+        [ValueDropdown("GetNewLanguages")]
+        private SystemLanguage _newLanguage = SystemLanguage.Afrikaans;
 
         [FoldoutGroup("Add New Language")]
         [ShowInInspector, PropertyOrder(1)]
-        [Button("🆕 Create New Language From Base (English)", ButtonSizes.Large), GUIColor(0.1f, 0.8f, 1f)]
-        private void CreateNewLanguageFromEnglish()
+        [ValueDropdown("GetAvailableLanguages")]
+        private string _baseLanguage = "English";
+
+        [FoldoutGroup("Add New Language")]
+        [ShowInInspector, PropertyOrder(2)]
+        [Button("🆕 Create New Language From Base", ButtonSizes.Large), GUIColor(0.1f, 0.8f, 1f)]
+        private void CreateNewLanguageFromBase()
         {
-            string newLang = newLanguage.ToString();
+            string newLang = _newLanguage.ToString();
             string targetPath = Path.Combine(LocalizationFolder, newLang + ".txt");
 
             if (File.Exists(targetPath))
@@ -68,17 +74,17 @@ namespace Localization.Editor
                 return;
             }
 
-            string basePath = Path.Combine(LocalizationFolder, "English.txt");
+            string basePath = Path.Combine(LocalizationFolder, _baseLanguage + ".txt");
             if (!File.Exists(basePath))
             {
-                Debug.LogError("Base English.txt not found!");
+                Debug.LogError($"Base language file '{_baseLanguage}.txt' not found!");
                 return;
             }
 
             File.Copy(basePath, targetPath);
             AssetDatabase.Refresh();
 
-            Debug.Log($"✅ Created '{newLang}' from English.");
+            Debug.Log($"✅ Created '{newLang}' from '{_baseLanguage}'.");
         }
 
         private void LoadLocalizationFile()
@@ -114,6 +120,16 @@ namespace Localization.Editor
                 yield return Path.GetFileNameWithoutExtension(file);
         }
 
+        private IEnumerable<SystemLanguage> GetNewLanguages()
+        {
+            var existing = new HashSet<string>(GetAvailableLanguages(), StringComparer.OrdinalIgnoreCase);
+            foreach (SystemLanguage lang in Enum.GetValues(typeof(SystemLanguage)))
+            {
+                if (!existing.Contains(lang.ToString()))
+                    yield return lang;
+            }
+        }
+        
         [Serializable]
         public class LocalizationEntry
         {
