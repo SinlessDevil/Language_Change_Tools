@@ -207,23 +207,32 @@ namespace Localization.Editor
                 if (string.IsNullOrEmpty(path)) continue;
 
                 var root = PrefabUtility.LoadPrefabContents(path);
-                var texts = root.GetComponentsInChildren<TMP_Text>(true);
+                bool wasModified = false;
 
+                var texts = root.GetComponentsInChildren<TMP_Text>(true);
                 foreach (var text in texts)
                 {
                     if (text.GetComponent<LocalizeBase>() == null)
                     {
-                        Undo.RecordObject(text.gameObject, "Add TMP_Localizer");
+                        Undo.RegisterCompleteObjectUndo(text.gameObject, "Add TMP_Localizer");
                         text.gameObject.AddComponent<TMP_Localizer>();
+                        EditorUtility.SetDirty(text.gameObject);
+                        wasModified = true;
                         addedCount++;
                     }
                 }
 
-                PrefabUtility.SaveAsPrefabAsset(root, path);
+                if (wasModified)
+                {
+                    EditorUtility.SetDirty(root); // 💡 чтобы точно зафиксировалось
+                    PrefabUtility.SaveAsPrefabAsset(root, path);
+                }
+
                 PrefabUtility.UnloadPrefabContents(root);
             }
 
             AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
             Debug.Log($"✅ Added TMP_Localizer to {addedCount} TMP_Text objects.");
         }
         
