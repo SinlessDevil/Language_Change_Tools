@@ -33,7 +33,7 @@ namespace Localization.Editor
         [FoldoutGroup("Localization File")]
         [ShowInInspector, PropertyOrder(1)]
         [OnValueChanged("FilterEntries")]
-        [LabelText("🔍 Search Key")]
+        [LabelText("Search Key")]
         private string _searchKey = string.Empty;
         
         [FoldoutGroup("Localization File")]
@@ -45,7 +45,7 @@ namespace Localization.Editor
 
         [FoldoutGroup("Localization File", expanded: true)]
         [ShowInInspector, PropertyOrder(3)]
-        [Button("💾 Save Current Language", ButtonSizes.Large), GUIColor(0.6f, 1f, 0.6f)]
+        [Button("Save Current Language", ButtonSizes.Large), GUIColor(0.6f, 1f, 0.6f)]
         private void Save()
         {
             if (string.IsNullOrEmpty(_selectedLanguage)) return;
@@ -60,17 +60,17 @@ namespace Localization.Editor
             File.WriteAllLines(path, lines);
             AssetDatabase.Refresh();
 
-            Debug.Log($"✅ Saved language file: {path}");
+            Debug.Log($"Saved language file: {path}");
         }
 
         [FoldoutGroup("Localization File", expanded: true)]
         [ShowInInspector, PropertyOrder(4)]
-        [Button("🗑 Delete Selected Language", ButtonSizes.Large), GUIColor(1f, 0.4f, 0.4f)]
+        [Button("Delete Selected Language", ButtonSizes.Large), GUIColor(1f, 0.4f, 0.4f)]
         private void DeleteSelectedLanguage()
         {
             if (string.IsNullOrEmpty(_selectedLanguage))
             {
-                Debug.LogWarning("⚠ No language selected to delete.");
+                Debug.LogWarning("No language selected to delete.");
                 return;
             }
 
@@ -79,7 +79,7 @@ namespace Localization.Editor
             {
                 File.Delete(path);
                 AssetDatabase.Refresh();
-                Debug.Log($"🗑 Deleted language file: {path}");
+                Debug.Log($"Deleted language file: {path}");
 
                 _selectedLanguage = null;
                 _entries.Clear();
@@ -87,7 +87,7 @@ namespace Localization.Editor
             }
             else
             {
-                Debug.LogWarning($"⚠ File not found: {path}");
+                Debug.LogWarning($"File not found: {path}");
             }
         }
         
@@ -103,7 +103,7 @@ namespace Localization.Editor
 
         [FoldoutGroup("Create New Language TxT")]
         [ShowInInspector, PropertyOrder(2)]
-        [Button("🆕 Create New Language From Base", ButtonSizes.Large), GUIColor(0.1f, 0.8f, 1f)]
+        [Button("Create New Language From Base", ButtonSizes.Large), GUIColor(0.1f, 0.8f, 1f)]
         private void CreateNewLanguageFromBase()
         {
             string newLang = _NewLanguage.ToString();
@@ -125,7 +125,7 @@ namespace Localization.Editor
             File.Copy(basePath, targetPath);
             AssetDatabase.Refresh();
 
-            Debug.Log($"✅ Created '{newLang}' from '{_BaseLanguage}'.");
+            Debug.Log($"Created '{newLang}' from '{_BaseLanguage}'.");
         }
 
         [FoldoutGroup("Find Localized Assets")]
@@ -134,7 +134,7 @@ namespace Localization.Editor
         private List<TMPAssetEntry> _localizersInAssets = new();
 
         [FoldoutGroup("Find Localized Assets", expanded: true)]
-        [Button("📁 Find All TMP_Localizers in Resources", ButtonSizes.Large), GUIColor(0.1f, 0.8f, 1f)]
+        [Button("Find All TMP_Localizers in Resources", ButtonSizes.Large), GUIColor(0.1f, 0.8f, 1f)]
         private void FindTMPLocalizersInAssets()
         {
             _localizersInAssets.Clear();
@@ -146,7 +146,7 @@ namespace Localization.Editor
                 GameObject prefabRoot = PrefabUtility.LoadPrefabContents(path);
                 if (prefabRoot == null)
                 {
-                    Debug.LogWarning($"❌ Failed to load prefab contents: {path}");
+                    Debug.LogWarning($"Failed to load prefab contents: {path}");
                     continue;
                 }
                 
@@ -156,15 +156,12 @@ namespace Localization.Editor
                 {
                     string objName = localizer.gameObject.name;
                     string parentName = localizer.transform.parent != null ? localizer.transform.parent.name : "(root)";
-                    string childName = localizer.transform.childCount > 0 ? localizer.transform.GetChild(0).name : "(no child)";
 
                     _localizersInAssets.Add(new TMPAssetEntry
                     {
                         AssetPath = path,
                         GameObjectName = objName,
                         ParentName = parentName,
-                        ChildName = childName,
-                        Component = localizer,
                         LocalizationKey = localizer.localizationKey
                     });
                 }
@@ -172,42 +169,71 @@ namespace Localization.Editor
                 PrefabUtility.UnloadPrefabContents(prefabRoot);
             }
 
-            Debug.Log($"✅ Done! Total found TMP_Localizers in prefabs: {_localizersInAssets.Count}");
+            Debug.Log($"Done! Total found TMP_Localizers in prefabs: {_localizersInAssets.Count}");
         }
         
         [FoldoutGroup("Find Localized Assets")]
-        [Button("💾 Save Changes To Assets", ButtonSizes.Large), GUIColor(0.6f, 1f, 0.6f)]
+        [Button("Save Changes To Assets", ButtonSizes.Large), GUIColor(0.6f, 1f, 0.6f)]
         private void ApplyLocalizationKeyChangesToAssets()
         {
-            var pathsToSave = new HashSet<string>();
+            Debug.Log("=== 🔁 Start Applying LocalizationKey Changes ===");
+
+            int updatedCount = 0;
+            var pathsToLog = new HashSet<string>();
 
             foreach (var entry in _localizersInAssets)
             {
-                if (entry.Component == null) continue;
-
-                Undo.RecordObject(entry.Component, "Change Localization Key");
-                entry.Component.localizationKey = entry.LocalizationKey;
-                EditorUtility.SetDirty(entry.Component.gameObject);
-
-                if (!string.IsNullOrEmpty(entry.AssetPath))
+                if (string.IsNullOrEmpty(entry.AssetPath) || string.IsNullOrEmpty(entry.GameObjectName))
                 {
-                    pathsToSave.Add(entry.AssetPath);
+                    Debug.LogWarning("⚠️ Missing path or object name, skipping.");
+                    continue;
                 }
-            }
 
-            foreach (var path in pathsToSave)
-            {
-                var prefabRoot = PrefabUtility.LoadPrefabContents(path);
-                PrefabUtility.SaveAsPrefabAsset(prefabRoot, path);
-                PrefabUtility.UnloadPrefabContents(prefabRoot);
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(entry.AssetPath);
+                if (prefab == null)
+                {
+                    Debug.LogWarning($"⚠️ Failed to load prefab at path: {entry.AssetPath}");
+                    continue;
+                }
+
+                var localizers = prefab.GetComponentsInChildren<LocalizeBase>(true);
+                foreach (var localizer in localizers)
+                {
+                    if (localizer.gameObject.name != entry.GameObjectName) continue;
+
+                    string oldKey = localizer.localizationKey;
+                    string newKey = entry.LocalizationKey;
+
+                    if (oldKey != newKey)
+                    {
+                        Undo.RecordObject(localizer, "Change Localization Key");
+                        localizer.localizationKey = newKey;
+                        EditorUtility.SetDirty(localizer);
+                        updatedCount++;
+
+                        Debug.Log($"📝 Updated '{entry.GameObjectName}' in '{entry.AssetPath}': '{oldKey}' ➜ '{newKey}'");
+                    }
+                    else
+                    {
+                        Debug.Log($"✅ No change needed for '{entry.GameObjectName}' (key already '{oldKey}')");
+                    }
+
+                    pathsToLog.Add(entry.AssetPath);
+                    break; // нашли нужный объект — идём дальше
+                }
+
+                EditorUtility.SetDirty(prefab);
             }
 
             AssetDatabase.SaveAssets();
-            Debug.Log("✅ Localization keys in assets updated and prefabs saved.");
+            AssetDatabase.Refresh();
+
+            Debug.Log($"🎉 Done! Updated {updatedCount} key(s), affected {pathsToLog.Count} prefab(s).");
         }
+
         
         [FoldoutGroup("Add Missing Localizers", expanded: true)]
-        [Button("➕ Add TMP_Localizer to All TMP_Text In Resources", ButtonSizes.Large), GUIColor(0.8f, 0.9f, 1f)]
+        [Button("Add TMP_Localizer to All TMP_Text In Resources", ButtonSizes.Large), GUIColor(0.8f, 0.9f, 1f)]
         private void AddTMP_LocalizersToResources()
         {
             int addedCount = 0;
@@ -215,16 +241,18 @@ namespace Localization.Editor
             GameObject[] allPrefabs = Resources.LoadAll<GameObject>("");
             foreach (var prefab in allPrefabs)
             {
-                if (prefab == null) continue;
+                if (prefab == null) 
+                    continue;
 
-                var path = AssetDatabase.GetAssetPath(prefab);
-                if (string.IsNullOrEmpty(path)) continue;
+                string path = AssetDatabase.GetAssetPath(prefab);
+                if (string.IsNullOrEmpty(path)) 
+                    continue;
 
-                var root = PrefabUtility.LoadPrefabContents(path);
+                GameObject root = PrefabUtility.LoadPrefabContents(path);
                 bool wasModified = false;
 
-                var texts = root.GetComponentsInChildren<TMP_Text>(true);
-                foreach (var text in texts)
+                TMP_Text[] texts = root.GetComponentsInChildren<TMP_Text>(true);
+                foreach (TMP_Text text in texts)
                 {
                     if (text.GetComponent<LocalizeBase>() == null)
                     {
@@ -238,7 +266,7 @@ namespace Localization.Editor
 
                 if (wasModified)
                 {
-                    EditorUtility.SetDirty(root); // 💡 чтобы точно зафиксировалось
+                    EditorUtility.SetDirty(root);
                     PrefabUtility.SaveAsPrefabAsset(root, path);
                 }
 
@@ -247,7 +275,7 @@ namespace Localization.Editor
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log($"✅ Added TMP_Localizer to {addedCount} TMP_Text objects.");
+            Debug.Log($"Added TMP_Localizer to {addedCount} TMP_Text objects.");
         }
         
         private void LoadLocalizationFile()
@@ -318,10 +346,10 @@ namespace Localization.Editor
         [Serializable]
         public class LocalizationEntry
         {
-            [HorizontalGroup("Row", Width = 250)]
+            [HorizontalGroup("Key = Value", Width = 250)]
             public string Key;
 
-            [HorizontalGroup("Row")]
+            [HorizontalGroup("Key = Value")]
             [MultiLineProperty(2)]
             public string Value;
         }
@@ -335,14 +363,8 @@ namespace Localization.Editor
             [ReadOnly, TableColumnWidth(150)]
             public string ParentName;
 
-            [ReadOnly, TableColumnWidth(150)]
-            public string ChildName;
-
             [ReadOnly, TableColumnWidth(300)]
             public string AssetPath;
-
-            [HideInInspector]
-            public LocalizeBase Component; 
 
             [TableColumnWidth(400, resizable: true)]
             public string LocalizationKey;
