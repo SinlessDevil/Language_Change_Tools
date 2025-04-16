@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Code.Localization.Code;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
@@ -18,7 +19,7 @@ namespace Localization.Editor
         {
             var window = GetWindow<LocalizationEditorWindow>();
             window.titleContent = new GUIContent("Localization Editor");
-            window.minSize = new Vector2(600, 500);
+            window.minSize = new Vector2(600, 800);
             window.Show();
         }
 
@@ -89,17 +90,17 @@ namespace Localization.Editor
             }
         }
         
-        [FoldoutGroup("Add New Language", expanded: true)]
+        [FoldoutGroup("Create New Language TxT", expanded: true)]
         [ShowInInspector, PropertyOrder(0)]
         [ValueDropdown("GetNewLanguages")]
-        private SystemLanguage _NewLanguage = SystemLanguage.Afrikaans;
+        private SystemLanguage _NewLanguage = SystemLanguage.Unknown;
 
-        [FoldoutGroup("Add New Language")]
+        [FoldoutGroup("Create New Language TxT")]
         [ShowInInspector, PropertyOrder(1)]
         [ValueDropdown("GetAvailableLanguages")]
         private string _BaseLanguage = "English";
 
-        [FoldoutGroup("Add New Language")]
+        [FoldoutGroup("Create New Language TxT")]
         [ShowInInspector, PropertyOrder(2)]
         [Button("🆕 Create New Language From Base", ButtonSizes.Large), GUIColor(0.1f, 0.8f, 1f)]
         private void CreateNewLanguageFromBase()
@@ -126,6 +127,70 @@ namespace Localization.Editor
             Debug.Log($"✅ Created '{newLang}' from '{_BaseLanguage}'.");
         }
 
+        [FoldoutGroup("Find Localized Assets")]
+        [TableList(AlwaysExpanded = true)]
+        [ShowInInspector]
+        private List<TMPAssetEntry> _localizersInAssets = new();
+
+        [FoldoutGroup("Find Localized Assets", expanded: true)]
+        [Button("📁 Find All TMP_Localizers in Resources", ButtonSizes.Large), GUIColor(0.1f, 0.8f, 1f)]
+        private void FindTMPLocalizersInAssets()
+        {
+            _localizersInAssets.Clear();
+
+            string[] guids = AssetDatabase.FindAssets("t:Prefab", new[] { "Assets" });
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                GameObject prefabRoot = PrefabUtility.LoadPrefabContents(path);
+                if (prefabRoot == null)
+                {
+                    Debug.LogWarning($"❌ Failed to load prefab contents: {path}");
+                    continue;
+                }
+                
+                LocalizeBase[] localizers = prefabRoot.GetComponentsInChildren<LocalizeBase>(true);
+
+                foreach (var localizer in localizers)
+                {
+                    string objName = localizer.gameObject.name;
+                    string parentName = localizer.transform.parent != null ? localizer.transform.parent.name : "(root)";
+                    string childName = localizer.transform.childCount > 0 ? localizer.transform.GetChild(0).name : "(no child)";
+
+                    _localizersInAssets.Add(new TMPAssetEntry
+                    {
+                        AssetPath = path,
+                        GameObjectName = objName,
+                        ParentName = parentName,
+                        ChildName = childName,
+                        Component = localizer,
+                        LocalizationKey = localizer.localizationKey
+                    });
+                }
+
+                PrefabUtility.UnloadPrefabContents(prefabRoot);
+            }
+
+            Debug.Log($"✅ Done! Total found TMP_Localizers in prefabs: {_localizersInAssets.Count}");
+        }
+        
+        [FoldoutGroup("Find Localized Assets")]
+        [Button("💾 Save Changes To Assets", ButtonSizes.Large), GUIColor(0.6f, 1f, 0.6f)]
+        private void ApplyLocalizationKeyChangesToAssets()
+        {
+            foreach (var entry in _localizersInAssets)
+            {
+                if (entry.Component == null) continue;
+
+                Undo.RecordObject(entry.Component, "Change Localization Key");
+                entry.Component.localizationKey = entry.LocalizationKey;
+                EditorUtility.SetDirty(entry.Component);
+            }
+
+            AssetDatabase.SaveAssets();
+            Debug.Log("✅ Localization keys in assets updated.");
+        }
+        
         private void LoadLocalizationFile()
         {
             _entries.Clear();
@@ -200,6 +265,28 @@ namespace Localization.Editor
             [HorizontalGroup("Row")]
             [MultiLineProperty(2)]
             public string Value;
+        }
+        
+        [Serializable]
+        public class TMPAssetEntry
+        {
+            [ReadOnly, TableColumnWidth(200)]
+            public string GameObjectName;
+
+            [ReadOnly, TableColumnWidth(150)]
+            public string ParentName;
+
+            [ReadOnly, TableColumnWidth(150)]
+            public string ChildName;
+
+            [ReadOnly, TableColumnWidth(300)]
+            public string AssetPath;
+
+            [HideInInspector]
+            public LocalizeBase Component; 
+
+            [TableColumnWidth(400, resizable: true)]
+            public string LocalizationKey;
         }
     }
 }
