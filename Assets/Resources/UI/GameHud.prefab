@@ -150,6 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localizationKey: so
+  _text: {fileID: 2703089668246871777}
 --- !u!1 &1873461456170480768
 GameObject:
   m_ObjectHideFlags: 0
@@ -185,8 +186,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -185.53857, y: 55.832886}
-  m_SizeDelta: {x: -461.2179, y: -314.38458}
+  m_AnchoredPosition: {x: -214.17346, y: 55.832886}
+  m_SizeDelta: {x: -518.4877, y: -314.3846}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5603375788990825691
 CanvasRenderer:
@@ -298,6 +299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localizationKey: ru
+  _text: {fileID: 8802848066749572383}
 --- !u!1 &2088966450242780577
 GameObject:
   m_ObjectHideFlags: 0
@@ -518,6 +520,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localizationKey: go
+  _text: {fileID: 6745997590823684149}
 --- !u!1 &3038911369929102861
 GameObject:
   m_ObjectHideFlags: 0
@@ -741,6 +744,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localizationKey: eng
+  _text: {fileID: 8204655942856900796}
 --- !u!1 &3512033971405753791
 GameObject:
   m_ObjectHideFlags: 0
@@ -1006,8 +1010,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 187, y: 55.833008}
-  m_SizeDelta: {x: -461.7052, y: -314.38}
+  m_AnchoredPosition: {x: 213.62549, y: 55.833008}
+  m_SizeDelta: {x: -514.9562, y: -314.38}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &784651582178854056
 CanvasRenderer:
@@ -1119,6 +1123,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localizationKey: uk
+  _text: {fileID: 6341152590287427063}
 --- !u!1 &5174823346860950775
 GameObject:
   m_ObjectHideFlags: 0
@@ -1432,6 +1437,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localizationKey: pla
+  _text: {fileID: 7309555813235861460}
 --- !u!1 &5365011530554689134
 GameObject:
   m_ObjectHideFlags: 0
@@ -2098,6 +2104,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localizationKey: ex
+  _text: {fileID: 6140615958831474822}
 --- !u!1 &8566553790827359936
 GameObject:
   m_ObjectHideFlags: 0

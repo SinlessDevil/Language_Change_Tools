@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace Code.Localization.Code.Services.LocalizeLanguageService
@@ -10,32 +11,25 @@ namespace Code.Localization.Code.Services.LocalizeLanguageService
 
         public List<string> GetAvailableLanguages()
         {
-            List<string> languages = new();
-
             TextAsset[] files = Resources.LoadAll<TextAsset>(ResourcesPath);
-            foreach (TextAsset file in files)
-            {
-                languages.Add(Path.GetFileNameWithoutExtension(file.name));
-            }
-
-            return languages;
+            return files.Select(file => Path.GetFileNameWithoutExtension(file.name)).ToList();
         }
 
         public void SetLanguage(string languageName)
         {
-            Localize.SetCurrentLanguage(LanguageNameToSystemLanguage(languageName));
+            Locale.CurrentLanguage = languageName.ToString();
+            Locale.PlayerLanguage = LanguageNameToSystemLanguage(languageName);
+            LocalizeBase[] allTexts = Object.FindObjectsOfType<LocalizeBase>();
+            foreach (var t in allTexts)
+                t.UpdateLocale();
         }
 
-        public string GetCurrentLanguage()
-        {
-            return Locale.CurrentLanguage;
-        }
-        
+        public string GetCurrentLanguage() => Locale.CurrentLanguage;
+
         private SystemLanguage LanguageNameToSystemLanguage(string name)
         {
             if (System.Enum.TryParse<SystemLanguage>(name, true, out var lang))
                 return lang;
-
             Debug.LogWarning($"⚠️ Unknown language '{name}', fallback to English.");
             return SystemLanguage.English;
         }

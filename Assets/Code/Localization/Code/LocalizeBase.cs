@@ -11,10 +11,7 @@ namespace Code.Localization.Code
         protected virtual void Start()
         {
             if (!Locale.currentLanguageHasBeenSet)
-            {
                 Locale.currentLanguageHasBeenSet = true;
-                SetCurrentLanguage(Locale.PlayerLanguage);
-            }
 
             UpdateLocale();
         }
@@ -25,15 +22,6 @@ namespace Code.Localization.Code
                 return Locale.currentLanguageStrings[key];
             
             return string.Empty;
-        }
-
-        public static void SetCurrentLanguage(SystemLanguage language)
-        {
-            Locale.CurrentLanguage = language.ToString();
-            Locale.PlayerLanguage = language;
-            Localize[] allTexts = FindObjectsOfType<Localize>();
-            for (int i = 0; i < allTexts.Length; i++)
-                allTexts[i].UpdateLocale();
         }
     }
 }

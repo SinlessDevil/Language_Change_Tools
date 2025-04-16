@@ -41,13 +41,10 @@ namespace Code.Localization.Code.UI
             _dropdown.SetValueWithoutNotify(currentIndex >= 0 ? currentIndex : 0);
 
             _dropdown.onValueChanged.AddListener(OnDropdownValueChanged);
-            _initialized = true;
         }
 
         private void OnDropdownValueChanged(int index)
         {
-            if (!_initialized) return;
-
             var selectedLanguage = _dropdown.options[index].text;
             _localizeLanguageService.SetLanguage(selectedLanguage);
         }

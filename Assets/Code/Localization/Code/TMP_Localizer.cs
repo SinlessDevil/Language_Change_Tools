@@ -6,7 +6,7 @@ namespace Code.Localization.Code
     [DisallowMultipleComponent]
     public class TMP_Localizer : LocalizeBase
     {
-        private TMP_Text _text;
+        [SerializeField] private TMP_Text _text;
 
         private void OnValidate()
         {
@@ -16,7 +16,8 @@ namespace Code.Localization.Code
 
         public override void UpdateLocale()
         {
-            if (!_text) return;
+            if (!_text) 
+                return;
 
             if (!System.String.IsNullOrEmpty(localizationKey) &&
                 Locale.currentLanguageStrings.ContainsKey(localizationKey))
