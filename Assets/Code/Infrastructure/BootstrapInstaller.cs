@@ -2,6 +2,7 @@ using Code.Infrastructure.Factory;
 using Code.Infrastructure.Services.PersistenceProgress;
 using Code.Infrastructure.Services.SaveLoad;
 using Code.Infrastructure.Services.StaticData;
+using Code.Localization.Code.Services.LocalizeLanguageService;
 using Services.PersistenceProgress;
 using UnityEngine.SceneManagement;
 using Zenject;
@@ -18,8 +19,14 @@ namespace Code.Infrastructure
 
             BindFactory();
             BindSaveLoad();
+            BindLocalizeLanguage();
             BindProgressData();
             BindStaticData();
+        }
+
+        private void BindLocalizeLanguage()
+        {
+            Container.BindInterfacesTo<LocalizeLanguageService>().AsSingle();
         }
 
         private void BindFactory()

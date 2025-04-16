@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace Localization
+namespace Code.Localization.Code
 {
-    public abstract class LocalizBase : MonoBehaviour
+    public abstract class LocalizeBase : MonoBehaviour
     {
         public string localizationKey;
 
@@ -23,15 +23,15 @@ namespace Localization
         {
             if (Locale.currentLanguageStrings.ContainsKey(key))
                 return Locale.currentLanguageStrings[key];
-            else
-                return string.Empty;
+            
+            return string.Empty;
         }
 
         public static void SetCurrentLanguage(SystemLanguage language)
         {
             Locale.CurrentLanguage = language.ToString();
             Locale.PlayerLanguage = language;
-            Localize[] allTexts = GameObject.FindObjectsOfType<Localize>();
+            Localize[] allTexts = FindObjectsOfType<Localize>();
             for (int i = 0; i < allTexts.Length; i++)
                 allTexts[i].UpdateLocale();
         }

@@ -22,14 +22,17 @@ namespace Localization.Editor
             window.Show();
         }
 
+        [FoldoutGroup("Localization File", expanded: true)]
         [ValueDropdown("GetAvailableLanguages")]
         [OnValueChanged("LoadLocalizationFile")]
         public string SelectedLanguage;
 
+        [FoldoutGroup("Localization File")]
         [TableList(AlwaysExpanded = true)]
         public List<LocalizationEntry> Entries = new();
 
-        [Button("💾 Save"), GUIColor(0.6f, 1f, 0.6f)]
+        [FoldoutGroup("Localization File", expanded: true)]
+        [Button("💾 Save Current Language", ButtonSizes.Large), GUIColor(0.6f, 1f, 0.6f)]
         private void Save()
         {
             if (string.IsNullOrEmpty(SelectedLanguage)) return;
@@ -45,6 +48,36 @@ namespace Localization.Editor
             AssetDatabase.Refresh();
 
             Debug.Log($"✅ Saved language file: {path}");
+        }
+
+        [FoldoutGroup("Add New Language", expanded: true)]
+        [ShowInInspector, PropertyOrder(99)]
+        private SystemLanguage newLanguage = SystemLanguage.Afrikaans;
+
+        [FoldoutGroup("Add New Language")]
+        [Button("🆕 Create New Language From Base (English)", ButtonSizes.Large), GUIColor(0.1f, 0.8f, 1f)]
+        private void CreateNewLanguageFromEnglish()
+        {
+            string newLang = newLanguage.ToString();
+            string targetPath = Path.Combine(LocalizationFolder, newLang + ".txt");
+
+            if (File.Exists(targetPath))
+            {
+                Debug.LogWarning($"Language '{newLang}' already exists.");
+                return;
+            }
+
+            string basePath = Path.Combine(LocalizationFolder, "English.txt");
+            if (!File.Exists(basePath))
+            {
+                Debug.LogError("Base English.txt not found!");
+                return;
+            }
+
+            File.Copy(basePath, targetPath);
+            AssetDatabase.Refresh();
+
+            Debug.Log($"✅ Created '{newLang}' from English.");
         }
 
         private void LoadLocalizationFile()

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Localization
+namespace Code.Localization.Code
 {
     public static class Locale
     {
@@ -9,12 +9,11 @@ namespace Localization
         private const string STR_LOCALIZATION_PREFIX = "localization/";
 
         private static string _currentLanguage;
-
+        private static TextAsset _currentLocalizationText;
+        
         public static bool currentLanguageHasBeenSet = false;
         public static Dictionary<string, string> currentLanguageStrings = new();
-
-        private static TextAsset _currentLocalizationText;
-
+        
         public static string CurrentLanguage
         {
             get { return _currentLanguage; }

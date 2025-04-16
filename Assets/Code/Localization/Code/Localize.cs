@@ -1,10 +1,10 @@
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
-namespace Localization
+namespace Code.Localization.Code
 {
     [RequireComponent(typeof(TMP_Text))]
-    public class Localize : LocalizBase
+    public class Localize : LocalizeBase
     {
         private TMP_Text _text;
 
@@ -21,7 +21,6 @@ namespace Localization
             if (!System.String.IsNullOrEmpty(localizationKey) &&
                 Locale.currentLanguageStrings.ContainsKey(localizationKey))
                 _text.text = Locale.currentLanguageStrings[localizationKey].Replace(@"\n", "" + '\n');
-            ;
         }
     }
 }
