@@ -2,12 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Code.Localization.Code;
-using Sirenix.OdinInspector;
-using Sirenix.OdinInspector.Editor;
-using TMPro;
 using UnityEditor;
 using UnityEngine;
+using Sirenix.OdinInspector;
+using Sirenix.OdinInspector.Editor;
+using Code.Localization.Code;
+using TMPro;
 
 namespace Localization.Editor
 {
