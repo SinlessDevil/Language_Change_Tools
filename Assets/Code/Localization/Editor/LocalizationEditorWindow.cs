@@ -16,7 +16,7 @@ namespace Localization.Editor
     {
         private const string LocalizationFolder = "Assets/Code/Localization/Intro/Resources/Localization";
 
-        [MenuItem("Tools/Localization Editor 🈺")]
+        [MenuItem("Tools/Localization Editor Window")]
         private static void OpenWindow()
         {
             LocalizationEditorWindow window = GetWindow<LocalizationEditorWindow>();
@@ -291,7 +291,8 @@ namespace Localization.Editor
             string[] lines = File.ReadAllLines(path);
             foreach (var line in lines)
             {
-                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) 
+                    continue;
 
                 string[] pair = line.Split(new[] { '=' }, 2);
                 if (pair.Length == 2)
